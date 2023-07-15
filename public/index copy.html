@@ -1,0 +1,94 @@
+<div>
+    <canvas id="myChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('myChart');
+
+    new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
+
+<h1>Hello, Worldu (in Hyderabad)!</h1>
+
+
+
+<a class="navbar-brand" href="#">
+  <img src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="Bootstrap" width="30" height="24">
+</a>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClinGenie</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand d-sm-none" href="#">ClinGenie</a>
+    <a class="navbar-brand d-none d-sm-block" href="#">ClinGenie - Full Text</a>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Select User
+          </a>
+          <div class="dropdown-menu" aria-labelledby="userDropdown">
+            <a class="dropdown-item" href="#" onclick="changeUser('Fred, CEO')">Fred, CEO</a>
+            <a class="dropdown-item" href="#" onclick="changeUser('Brenda, HR')">Brenda, HR</a>
+            <a class="dropdown-item" href="#" onclick="changeUser('Clarke, Finance')">Clarke, Finance</a>
+            <a class="dropdown-item" href="#" onclick="changeUser('Nancy, Business')">Nancy, Business</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Welcome to ClinGenie</h1>
+    <p>This is a simple single-page website.</p>
+    <h2 id="selectedUser">Selected User: Fred, CEO</h2>
+
+    <div class="form-group">
+      <label for="datasetDropdown">Select the dataset</label>
+      <select class="form-control" id="datasetDropdown" onchange="changeDataset()">
+        <option value="dataset1">Dataset 1</option>
+        <option value="dataset2">Dataset 2</option>
+        <option value="dataset3">Dataset 3</option>
+      </select>
+    </div>
+
+    <div id="radioGroup" class="horizontal-scroll">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="datasetRadio" id="radioOption1" value="option1" checked>
+        <label class="form-check-label" for="radioOption1">
+          <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
+          <div>Quisque non orci maximus, eleifend elit ac, consectetur lacus.</div>
+          <div>Phasellus tincidunt diam id arcu fringilla, sit amet iaculis massa pharetra.</div>
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="datasetRadio" id="radioOption2" value="option2">
+        <label class="form-check-label" for="radioOption2">
+          <div>Nulla at lacus vel dolor cursus
