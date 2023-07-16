@@ -11,7 +11,7 @@ module.exports = {
     });
     const chain = new SqlDatabaseChain({
       llm: new OpenAI({
-        openAIApiKey: "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",
+        openAIApiKey: "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",
         temperature: 0,
       }),
       database: db,
