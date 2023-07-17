@@ -51,6 +51,7 @@
       background-color: #f2f2f2;
       overflow-x: hidden;
       padding-top: 20px;
+      overflow-y: auto;
     }
 
     .sidebar .heading {
@@ -63,12 +64,14 @@
       padding: 8px;
       border: 1px solid #ccc;
       margin-bottom: 8px;
+      overflow-y: auto;
     }
 
     .sidebar a {
       display: block;
       color: black;
       text-decoration: none;
+      overflow-y: auto;
     }
 
     .sidebar a:hover {
@@ -79,7 +82,49 @@
       margin-left: 200px;
       margin-top: 70px;
       padding: 16px;
+      overflow-y: auto;
     }
+
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .bottom-bar {
+      position: fixed;
+        bottom: 0;
+        left: 0;
+        width: calc(100% - 200px); /* Adjust the width based on the sidebar's width */
+        margin-left: 200px; /* Adjust the margin to match the sidebar's width */
+        background-color: white;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+    }
+
   </style>
 
   <!-- update the version number as needed -->
@@ -104,6 +149,16 @@
 
 <body>
 
+  
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <!-- Plot content goes here -->
+      <div id="plot-container"></div>
+    </div>
+  </div>
+
+
   <div id="spinner" class="hide-spinner">
     <div class="spinner-container">
       <div class="spinner-border text-primary" role="status">
@@ -111,6 +166,7 @@
       <div class="overlay"></div>
     </div>
   </div>
+
 
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
@@ -170,18 +226,19 @@
     </div>
 
     <!-- Create a div covering that extends upto the bottom with dark border -->
-    <div class="border border-dark rounded-3" style="height: 45vh;" id="result">
+    <div class="border border-dark rounded-3" style="height: 42vh;" id="result">
     </div>
 
     <!-- Provide a multi-line input anchored to the bottom of the viewport spanning the full width of the screen in a responsive way-->
-    <div class="position-fixed bottom-0 start-0 w-100">
+    <!-- position-fixed bottom-0 start-0 w-100 -->
+    <div class="bottom-bar">
       <div class="input-group">
         <textarea class="form-control" aria-label="With textarea" id="query"
           placeholder="Enter your query here"></textarea>
         <button class="btn btn-outline-secondary" type="button" id="query-button"
           onclick="submitQuery()">Submit</button>
         <button class="btn btn-outline-secondary" type="button" id="plot-button"
-          onclick="plot()">Plot</button>
+          onclick="openModal()">Plot</button>
         <button class="btn btn-outline-secondary" type="button" id="save-button"
           onclick="saveQuery()">Save</button>
       </div>
@@ -359,6 +416,9 @@
       $("#sql").text(row.sql_query);
       $("#result").text(row.answer);
       $("#query").text(row.question);
+      console.log('The query is : ', row.question);
+      console.log('The answer is : ', row.answer);
+      console.log('The sql query is : ', row.sql_query);
 
     };
 
@@ -366,6 +426,49 @@
     populateSidebar();
 
 
+    var plotEndPoint = local ? "http://localhost:5000/plot" : "https://gptquery-kh2omyweuq-uc.a.run.app";
+    async function openModal() {
+      try {
+        var query = $("#query").val();
+        console.log('Inna pidicho', query);
+        const response = await fetch(plotEndPoint, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+          query
+          })
+        });
+      if (response.ok) {
+        const blob = await response.blob();  // Get the response as a Blob object
+        // Create a URL for the blob object
+        const imageURL = URL.createObjectURL(blob);
+        // Set the image source to the URL
+        const imgElement = document.createElement('img');
+        imgElement.src = imageURL;
+  
+        const plotContainer = document.getElementById('plot-container');
+        plotContainer.innerHTML = '';
+        plotContainer.appendChild(imgElement);
+      
+        // Hide the spinner and show the modal
+        $("#spinner").addClass("hide-spinner");
+        const modal = document.getElementById('myModal');
+        modal.style.display = 'block';
+      } else {
+        throw new Error('Request failed');
+      }
+      } catch (error) {
+        $("#result").text(JSON.stringify(error));
+        $("#spinner").addClass("hide-spinner");
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('myModal');
+      modal.style.display = 'none';
+    }
 
 
 
