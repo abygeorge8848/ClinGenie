@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = ""
 
 app = Flask(__name__)
 CORS(app)
