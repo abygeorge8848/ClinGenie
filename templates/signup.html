@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Page</title>
+
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f7f7f7;
+}
+
+.modal {
+    width: 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.iqvia-title {
+    color: #3366cc; /* Dark blue */
+    margin: 0;
+}
+
+.signup-heading {
+    color: #5db0e6; /* Light blue */
+    margin-top: 20px;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px 0;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-container input[type="password"] {
+    padding-right: 30px;
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.signup-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745; /* Green */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.sign-up-label {
+    text-align: center;
+    color: #888;
+    margin-top: 20px;
+}
+
+
+.iqvia-title {
+    color: #3366cc; /* Dark blue */
+    margin: 0;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <div class="header">
+            <div class="header-container">
+                <h1 class="iqvia-title">ClinGenie</h1>
+            </div>
+        </div>
+        <div class="content">
+            <h2 class="signup-heading">IQVIA Sign Up</h2>
+            <div class="input-container">
+                <input type="text" placeholder="Email" id="emailInput">
+                <div class="password-container">
+                    <input type="password" placeholder="Password" id="passwordInput">
+                    <i class="toggle-password fas fa-eye" onclick="togglePasswordVisibility()"></i>
+                </div>
+            </div>
+            <button class="signup-button" onclick="signIn()">Sign Up</button>
+
+            <p class="login-link">Already have an account? <a href="/">Login!</a></p>
+        </div>
+    </div>
+
+
+    <script>
+        
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById("passwordInput");
+    const togglePasswordIcon = document.querySelector(".toggle-password");
+    const type = passwordInput.getAttribute("type");
+
+    passwordInput.setAttribute("type", type === "password" ? "text" : "password");
+
+    // Change the icon based on the password visibility
+    togglePasswordIcon.classList.toggle("fa-eye");
+    togglePasswordIcon.classList.toggle("fa-eye-slash");
+}
+
+        function signIn() {
+            fetch('/profile', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/profile';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to ClinGenie</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.js"></script>
+
+    <script src="/static/js/cg.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/css/cg.css">
+
+
+
+    <!-- update the version number as needed -->
+    <!-- <script defer src="/__/firebase/9.22.1/firebase-app-compat.js"></script> -->
+    <!-- include only the Firebase features as you need -->
+    <!--   <script defer src="/__/firebase/9.22.1/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-database-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-firestore-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-functions-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-messaging-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-storage-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-analytics-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-remote-config-compat.js"></script>
+  <script defer src="/__/firebase/9.22.1/firebase-performance-compat.js"></script> -->
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <!-- <script defer src="/__/firebase/init.js?useEmulator=true"></script> -->
+
+</head>
+
+<body>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h2>Save Query</h2>
+          <form id="queryForm" class="center-form">
+            <input type="text" id="queryName" name="queryName" placeholder="Enter query name" required>
+            <input type="submit" value="Submit" onclick="submitSave()">
+          </form>
+        </div>
+      </div>
+    
+    
+      <div id="spinner" class="hide-spinner">
+        <div class="spinner-container">
+          <div class="spinner-border text-primary" role="status">
+          </div>
+          <div class="overlay"></div>
+        </div>
+      </div>
+    
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+    
+          <a class="navbar-brand d-sm-none" href="#"><img src="/static/img/clingenie.png" alt="ClinGenie" width="30"
+            height="24"></a>
+          <a class="navbar-brand d-none d-sm-block" href="#"><img src="/static/img/clingenie.png" alt="ClinGenie"
+            width="30" height="24">ClinGenie</a>
+    
+          <div class="d-flex">
+    
+            <!-- Button trigger modal -->
+            <div class="btn-group">
+              <button id="dropdownMenuButton" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  Disease dataset
+              </button>
+              <ul class="dropdown-menu">
+                  <li><a class="dropdown-item active" value="0" onclick="updateButton(this)">Disease dataset</a></li>
+                  <li><a class="dropdown-item" value="1" onclick="updateButton(this)">Health dataset</a></li>
+                  <li><a class="dropdown-item" value="2" onclick="updateButton(this)">Sleep dataset</a></li>
+              </ul>
+          </div>
+          
+            &nbsp;
+            <div class="dropdown me-1">
+              <button class="btn btn-secondary" type="button" aria-expanded="false" id="user">
+                John Doe
+              </button>
+              <!--           <ul class="dropdown-menu" id="userDropdown">
+                <li><a class="dropdown-item" href="#">Fredrick, Sales</a></li>
+                <li><a class="dropdown-item" href="#">Patricia, Finance</a></li>
+                <li><a class="dropdown-item" href="#">Brenda, HR</a></li>
+              </ul> -->
+            </div>
+          </div>
+        </div>
+      </nav>
+    
+    
+      <div class="sidebar" id="sidebar">
+        <div class="heading">History</div>
+      </div>
+    
+    
+      <div class="container">
+    
+        <h1>Welcome to ClinGenie</h1>
+        <p class="text-success-emphasis">This is a ChatGPT POC for querying SQL databases in natural language and
+          generating reports and charts.
+          Provide your query relevant to the database chosen and get your responses back
+          <br />
+          <b>(c) Aravind Ramachandran, Aby George, N Venkatraj, IQVIA, 2023</b>
+        </p>
+    
+        <!-- A multi-line input spanning the full width of the screen that is responsive -->
+        <div class="border border-dark rounded-3 mb-1">
+          <div class="input-group">
+            <textarea class="form-control" aria-label="With textarea" id="query"
+              placeholder="Enter your query here"></textarea>
+            <button class="btn btn-outline-secondary" type="button" id="query-button"
+              onclick="submitQuery()">Submit</button>
+            <button class="btn btn-outline-secondary" type="button" id="save-button"
+              onclick="saveQuery()">Save</button>
+          </div>
+        </div>
+    
+        <!--  LLM Output -->
+        <div class="border border-dark rounded-3 mb-1" id="llmOutput" style="overflow-y: scroll; height: 15vh">
+        </div>
+    
+        <!-- Create a div that contains two columns with the first column containing the SQL query and the second column containing the result -->
+        <div class="row">
+          <div class="col-6">
+            <div class="border border-dark rounded-3 mb-1" style="height: 44vh; overflow:auto;" id="result">
+              <table id="dataTable" style="width: 90%; height: 90%;">
+                <thead>
+                  <tr>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="border border-dark rounded-3 mb-1" style="height: 44vh; overflow:auto;" id="chart">
+              <!-- Create a row of icons on the top of the div -->
+              <div class="row">
+                <div class="col-2">
+                  <button type="button" id="barChartButton" class="btn btn-outline-secondary" id="bar-chart"
+                      onclick="createBarChart()">
+                      <img src="/static/img/bar-chart.png" alt="Bar Chart" width="30" height="30">
+                  </button>
+              </div>
+              <div class="col-2">
+                  <button type="button" class="btn btn-outline-secondary" id="bar-chart"
+                      onclick="createHorizontalBarChart()">
+                      <img src="/static/img/horizontal-bar-chart.png" alt="Bar Chart" width="30" height="30">
+                  </button>
+              </div>
+              <div class="col-2">
+                  <button type="button" class="btn btn-outline-secondary" id="pie-chart"
+                      onclick="createPieChart()">
+                      <img src="/static/img/pie-chart.png" alt="Pie Chart" width="30" height="30">
+                  </button>
+              </div>
+              <div class="col-2">
+                  <button type="button" class="btn btn-outline-secondary" id="line-chart"
+                      onclick="createLineChart()">
+                      <img src="/static/img/line-chart.png" alt="Line Chart" width="30" height="30">
+                  </button>
+              </div>
+              </div>
+              
+              <div class="col-12 mt-3 mb-3 d-flex justify-content-center flex-column align-items-center">
+                <input type="range" id="dataSlider" min="0" max="100" value="0" class="slider" disabled>
+                <p class="mt-1" id="sliderLabel">Data Slider: <span id="sliderValue">0</span></p>
+              </div>
+              
+              
+              <!-- Create a canvas for the chart -->
+              <canvas id="myChart" width="300" height="240"></canvas>
+            </div>
+    
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" id="dataset-modal">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Choose from available datasets:</h1>
+                  </div>
+                  <div class="modal-body">
+                    <div class="btn-group-vertical" role="group" aria-label="Vertical radio toggle button group">
+                      <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio1" autocomplete="off"
+                        value="Finance Dataset">
+                      <label class="btn btn-outline-info" for="vbtn-radio1">This dataset contains all the
+                        financial
+                        information for the last 20 years. Income, expenses, assets, liabilities, transactions,
+                        pricing, etc are all contained in this dataset.</label>
+                      <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio2" autocomplete="off"
+                        value="HR Dataset">
+                      <label class="btn btn-outline-info" for="vbtn-radio2">Contains HR data for the last 7 years,
+                        including hires, promotions, salaries, inter-department moves, terminations and
+                        voluntary
+                        separations.</label>
+                      <input type="radio" class="btn-check" name="vbtn-radio" id="vbtn-radio3" autocomplete="off"
+                        value="Oncology Dataset">
+                      <label class="btn btn-outline-info" for="vbtn-radio3">Clinical data from multiple oncology
+                        studies for the last 10 years in US & Europe.</label>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+                <script>
+
+                    var local = window.location.hostname == "localhost";
+                    var globalData = [];
+                    var globalCols = [];
+                    var databaseValue = "0";
+
+                    var user = $("#user").text();
+                    var dataset = $("#dataset").text();
+
+                    document.getElementById('dataSlider').addEventListener('input', function(e) {
+                      document.getElementById('sliderValue').innerText = e.target.value;
+                    });
+
+                    function updateButton(element) {
+                      var button = document.getElementById('dropdownMenuButton');
+                      button.textContent = element.textContent;
+                      databaseValue = element.getAttribute('value');
+                      console.log(`The type of database value is : ${typeof(databaseValue)}`);
+                      console.log(`The value of the database variable is : ${databaseValue}`);
+                    }
+
+                    function changeUser(user) {
+                        document.getElementById("userDropdown").textContent = user;
+                    }
+
+                    $("#userDropdown li a").click(function () {
+                        $("#user").text($(this).text());
+                        user = $(this).text();
+                    });
+
+                    $(".btn-check").click(function () {
+                        $("#dataset").text($(this).val());
+                        dataset = $(this).val();
+                    });
+
+                    function submitQuery() {
+                        $("#spinner").removeClass("hide-spinner");
+                        if (dataTable)
+                            dataTable.destroy();
+                        $("#dataTable").find('thead tr').empty();
+                        $("#dataTable").find('tbody').empty();
+
+                        //$("#dataTable").empty();
+                        try {
+                            myChart.destroy();
+                        } catch (error) {
+                            //console.log(error);
+                        }
+                        $("#myChart").empty();
+
+                        $("#llmOutput").empty();
+
+                        var query = $("#query").val();
+                        //Fetch the results by making an API call to /query endpoint
+                        //Display the results in the div
+
+                        const gptEndPoint = "http://127.0.0.1:5000/gpt/completions";
+                        fetch(gptEndPoint, {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                query,
+                                databaseValue
+                            })
+                        }).then((response) => {
+                            try {
+                                return response.json();
+                            } catch (error) {
+                                $("#llmOutput").text(JSON.stringify(error));
+                                $("#spinner").addClass("hide-spinner");
+                                return;
+                            }
+                        }).then((data) => {
+                            const llmOutput = `
+            <b>SQL:</b> ${data.choices[0].message.content}<br>
+            --------------------------------<br>
+            <b>Usage:</b> Prompt Tokens ${data.usage.prompt_tokens}, Completion Tokens ${data.usage.completion_tokens}, Total Tokens ${data.usage.total_tokens}<br>
+            <b>Cost:</b> @$0.03/1K Prompt Tokens = ${getCents(data.usage.prompt_tokens / 1000 * 0.03)}c, @$0.06/1K Completion Tokens = ${getCents(data.usage.completion_tokens / 1000 * 0.06)}c, Total ${getCents((data.usage.prompt_tokens / 1000 * 0.03) + (data.usage.completion_tokens / 1000 * 0.06))}c<br>
+            --------------------------------<br>
+            <b>Created:</b> ${new Date(data.created * 1000)}, 
+            <b>ID:</b> ${data.id}<br>
+            <b>Model:</b> ${data.model},
+            <b>Object:</b> ${data.object}<br>
+          `;
+                            $("#llmOutput").html(llmOutput);
+
+                            //Now try and get the SQL results through a separate call
+                            var sql = data.choices[0].message.content;
+                            //Sometimes the output comes as text with triple backquote enclosed SQL statement in it. Handle that
+                            sql = SQLfromLLMOutput(sql) || sql;
+                            fetchData(query, sql);
+                        });
+                    }
+
+                    function fetchData(query, sql) {
+
+                        const sqlEndPoint = "http://127.0.0.1:5000/sql/query";
+                        fetch(sqlEndPoint, {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                query,
+                                sql,
+                                databaseValue 
+                            })
+                        }).then((response) => {
+                            try {
+                                return response.json();
+                            } catch (error) {
+                                $("#dataTable").find('thead tr').text(JSON.stringify(error));
+                                $("#spinner").addClass("hide-spinner");
+                            }
+                        }).then((data) => {
+                            //Store result in memory to use for charting
+                            if (data.status === 'success') {
+                                if (data.type === 'table') {
+                                    globalData = data.data;
+                                    globalCols = data.columnNames;
+                                    createTable();
+                                } else {
+                                    //Its a text output
+                                    data = data.data;
+                                    const addLlmOutput = `
+            --------------------------------<br>
+            <b>Additional Usage for textifying output</b><br>
+            --------------------------------<br>
+            <b>Usage:</b> Prompt Tokens ${data.usage.prompt_tokens}, Completion Tokens ${data.usage.completion_tokens}, Total Tokens ${data.usage.total_tokens}<br>
+            <b>Cost:</b> @$0.03/1K Prompt Tokens = ${getCents(data.usage.prompt_tokens / 1000 * 0.03)}c, @$0.06/1K Completion Tokens = ${getCents(data.usage.completion_tokens / 1000 * 0.06)}c, Total ${getCents((data.usage.prompt_tokens / 1000 * 0.03) + (data.usage.completion_tokens / 1000 * 0.06))}c<br>
+            --------------------------------<br>
+            <b>Created:</b> ${new Date(data.created * 1000)}, 
+            <b>ID:</b> ${data.id}<br>
+            <b>Model:</b> ${data.model},
+            <b>Object:</b> ${data.object}<br>
+          `;
+                                    $("#llmOutput").append(addLlmOutput);
+                                    $("#dataTable").find('thead tr').append(data.choices[0].message.content);
+                                }
+                            } else {
+                                $("#dataTable").find('thead tr').text(data.message);
+                            }
+                            $("#spinner").addClass("hide-spinner");
+                        });
+                    }
+ 
+                    var dataTable = null;
+                    function createTable() {
+
+                        if (globalData.length == 0) {
+                            $("#dataTable").find('thead tr').append(`<th>No data found</th>`);
+                            return;
+                        }
+
+                        dataTable = $("#dataTable").DataTable({
+                            data: dtFormatData(globalData, globalCols),
+                            columns: dtFormatCols(globalCols)
+                        })
+
+                        createBarChart();
+                    }
+
+                    function isNumeric(n) {
+                        return !isNaN(parseFloat(n)) && isFinite(n);
+                    }
+
+                    function getCents(x) {
+                        return Number((Math.round(x * 100) / 100).toFixed(2)) * 100;
+                    }
+
+                    function createBarChart() { createChart('bar') }
+                    function createHorizontalBarChart() { createChart('horizontalBar') }
+                    function createLineChart() { createChart('line') }
+                    function createPieChart() { createChart('pie') }
+                    var myChart;
+
+                    function createChart(chartType) {
+                        //const canvas = document.getElementById('myChart');
+                        try {
+                            myChart.destroy();
+                        } catch (error) {
+                            //console.log(error);
+                        }
+                        if (globalData.length == 0) {
+                            return;
+                        }
+
+                        var ctx = document.getElementById('myChart').getContext('2d');
+
+                        let slider = document.getElementById('dataSlider');
+
+                        myChart = new Chart(ctx, {
+                          type: chartType === 'horizontalBar' ? 'bar' : chartType,
+                          data: {
+                            labels: globalData.map(e => e[Object.keys(globalData[0])[0]]),
+                            datasets: [{
+                              label: globalCols[1],
+                              data: globalData.map(e => e[Object.keys(globalData[0])[1]]),
+                              borderWidth: 1
+                            }]
+                          },
+                          options: {
+                            indexAxis: chartType === 'horizontalBar' ? 'y' : 'x',
+                            scales: {
+                              y: {
+                                beginAtZero: true
+                              }
+                            }
+                          }
+                        });
+
+                        slider.max = globalData.length;
+                        slider.disabled = false;
+
+                        slider.oninput = function() {
+                          let slicedData = globalData.slice(0, this.value);
+                          let otherDataSum = globalData.slice(this.value).reduce((sum, curr) => sum + curr[Object.keys(globalData[0])[1]], 0);
+
+                          // If the chart is a pie chart, update the data accordingly
+                          if (chartType === 'pie') {
+                            myChart.data.labels = slicedData.map(e => e[Object.keys(slicedData[0])[0]]).concat('Others');
+                            myChart.data.datasets[0].data = slicedData.map(e => e[Object.keys(slicedData[0])[1]]).concat(otherDataSum);
+                          } else {
+                          // Otherwise, update the data as for a bar or line chart
+                            myChart.data.labels = slicedData.map(e => e[Object.keys(slicedData[0])[0]]);
+                            myChart.data.datasets[0].data = slicedData.map(e => e[Object.keys(slicedData[0])[1]]);
+                            if (otherDataSum > 0) {
+                              myChart.data.labels.push('Others');
+                              myChart.data.datasets[0].data.push(otherDataSum);
+                            }
+                            // If the chart is a horizontal bar chart, reverse the labels and data arrays
+                            if (chartType === 'horizontalBar') {
+                              myChart.data.labels.reverse();
+                              myChart.data.datasets[0].data.reverse();
+                            }
+                          }
+                          myChart.update();
+                        }
+
+
+                    }
+
+
+            <!--  ####################    Code to review    ######################     -->
+
+                    const fetchHistory = async () => {
+                        try {
+                            const response = await fetch('/data'); 
+                            const data = await response.json();
+                            return data;
+                        } catch (error) {
+                        console.error(error);
+                        }
+                    };
+
+  
+                    const populateSidebar = async () => {
+                        const sidebar = document.getElementById('sidebar');
+                        const data = await fetchHistory();
+
+                        data.forEach((row) => {
+                            const entry = document.createElement('div');
+                            entry.classList.add('entry');
+
+                            const link = document.createElement('a');
+                            link.textContent = row.shortName;
+                            link.href = `#${row.id}`;
+                            link.id = row.id;
+
+                            link.addEventListener('click', () => {
+                                handleRowClick(row);
+                            });
+
+                            const trashIcon = document.createElement('i');
+                            trashIcon.classList.add('fas', 'fa-trash-alt', 'trash-icon');
+                            trashIcon.style.display = 'none';
+
+                            const refreshIcon = document.createElement('i');
+                            refreshIcon.classList.add('fas', 'fa-sync-alt', 'refresh-icon');
+                            refreshIcon.style.display = 'none';
+                            let tooltipText = document.createElement('span');
+                            tooltipText.classList.add('tooltip-text');
+                            let currentDateTime = `Last refresh at : ${new Date()}`;
+                            tooltipText.innerText = currentDateTime;
+                            refreshIcon.appendChild(tooltipText);
+                            let textLength = tooltipText.innerText.length;
+                    
+
+                            refreshIcon.addEventListener('click', () => {
+                              refreshQuery(row.data, row.question);
+                            });
+
+                            entry.addEventListener('mouseover', () => {
+                                trashIcon.style.display = 'inline-block';
+                                refreshIcon.style.display = 'inline-block';
+                            });
+                            entry.addEventListener('mouseout', () => {
+                                trashIcon.style.display = 'none';
+                                refreshIcon.style.display = 'none';
+                            });
+                            trashIcon.addEventListener('click', () => {
+                                handleDelete(row.id);
+                            });
+
+                            entry.appendChild(link);
+                            entry.appendChild(trashIcon);
+                            entry.appendChild(refreshIcon);
+                            sidebar.appendChild(entry);      
+                            });
+                    };
+
+                    
+                    const handleRowClick = (row) => {
+
+                      $("#query").empty();
+                      $("#query").text(row.question);
+                      $("#llmOutput").html(row.data);
+                      if (dataTable)
+                          dataTable.destroy();
+                      $("#dataTable").find('thead tr').empty();
+                      $("#dataTable").find('tbody').empty();
+                      globalData = JSON.parse(row.rawdata);
+                      globalCols = JSON.parse(row.columnnames);
+                      console.log(`This is the global data : ${globalData}`);
+                      console.log(`This is the global cols : ${globalCols}`)
+                      createTable();
+
+                    };
+
+                    function handleDelete(rowId) {
+
+                        $("#spinner").removeClass("hide-spinner");
+
+                        fetch('/data/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ rowId: rowId })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to delete the row.');
+                            }
+                            document.getElementById(rowId).remove();
+                            window.location.reload();
+                            $("#spinner").addClass("hide-spinner");
+                        })
+                        .catch(error => {
+                            console.log('Error deleting row:', error);
+                        });
+                    }
+
+
+                    function refreshQuery(rowData, question){
+                      var parser = new DOMParser();
+                      var doc = parser.parseFromString(rowData, "text/html");
+                      var sqlTag = doc.querySelector('b');
+                      var sqlQuery = sqlTag.nextSibling.textContent.trim();
+                      sqlQuery = SQLfromLLMOutput(sqlQuery) || sqlQuery;
+
+                      if (dataTable)
+                          dataTable.destroy();
+                      $("#dataTable").find('thead tr').empty();
+                      $("#dataTable").find('tbody').empty();
+                      try {
+                          myChart.destroy();
+                      } catch (error) {
+                        console.log(error);
+                      }                      $("#myChart").empty();
+                      $("#llmOutput").empty();
+                      $("#llmOutput").html(rowData);
+                      fetchData(question, sqlQuery);
+
+                    }
+
+                    var modal = document.getElementById("myModal");
+                    var span = document.getElementsByClassName("close")[0];
+                    var form = document.getElementById("queryForm");
+                    var queryName;
+
+                    let dataStore = null;
+                    var saveEndPoint = "http://127.0.0.1:5000/save";
+
+
+                    function saveQuery() {
+                        modal.style.display = "block";
+                    }
+
+                    span.onclick = function() {
+                        modal.style.display = "none";
+                    }
+
+                    window.onclick = function(event) {
+                        if (event.target == modal) {
+                            modal.style.display = "none";
+                        }
+                    }
+
+
+                    function submitSave() {
+                        shortName = $("#queryName").val();
+                        modal.style.display = "none";
+
+                        $("#spinner").removeClass("hide-spinner");
+
+                        var question = $("#query").val();
+                        var llmOutputDiv = document.getElementById('llmOutput');
+                        var data = llmOutputDiv.innerHTML.toString();
+                        let globalData_string = JSON.stringify(globalData);
+                        let globalCols_string = JSON.stringify(globalCols);
+
+                        fetch(saveEndPoint, {
+                            method: "POST",
+                            headers: {
+                            'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                shortName,
+                                question,
+                                data,
+                                globalData_string,
+                                globalCols_string
+                            })
+                        }).then((response) => {
+                            try {
+                                console.log(`Sent my data`);
+                                return response.json();
+                            } catch (error) {
+                                $("#spinner").addClass("hide-spinner");
+                            }
+                        }).then((data) => {
+                            window.location.reload();
+                            $("#spinner").addClass("hide-spinner");
+                        });
+                    }
+
+                    populateSidebar();
+                    
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        //const loadEl = document.querySelector('#load');
+                        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+                        // // The Firebase SDK is initialized and available here!
+                        //
+                        // firebase.auth().onAuthStateChanged(user => { });
+                        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+                        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+                        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+                        // firebase.messaging().requestPermission().then(() => { });
+                        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+                        // firebase.analytics(); // call to activate
+                        // firebase.analytics().logEvent('tutorial_completed');
+                        // firebase.performance(); // call to activate
+                        //
+                        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+                        /*         try {
+                                  let app = firebase.app();
+                                  let features = [
+                                    'auth',
+                                    'database',
+                                    'firestore',
+                                    'functions',
+                                    'messaging',
+                                    'storage',
+                                    'analytics',
+                                    'remoteConfig',
+                                    'performance',
+                                  ].filter(feature => typeof app[feature] === 'function');
+                                  console.log(`Firebase SDK loaded with ${features.join(', ')}`);
+                                  //loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+                                } catch (e) {
+                                  console.error(e);
+                                  //loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+                                } */
+                    });
+                </script>
+</body>
+
+</html>

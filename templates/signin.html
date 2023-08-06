@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    padding: 10px 0;
+    /*background-color: #5db0e6 ;*/
+}
+
+.iqvia-title {
+    color: #3366cc; /* Dark blue */
+    margin: 0;
+}
+
+.login-heading {
+    color: #5db0e6; /* Light blue */
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px 0;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #3366cc;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sign-up-button {
+    width: 100%;
+    background-color: #28a745; /* Green */
+}
+
+.sign-up-label {
+    text-align: center;
+    color: #888;
+}
+
+    </style>
+
+</head>
+<body>
+    <div class="modal">
+        <div class="header">
+            <h1 class="iqvia-title">ClinGenie</h1>
+        </div>
+        <div class="content">
+            <h3 class="login-heading">IQVIA Login</h3>
+            <div class="input-container">
+                <input type="text" placeholder="Email" id="emailInput">
+                <input type="password" placeholder="Password" id="passwordInput">
+            </div>
+            <div class="button-container">
+                <button onclick="signIn()">Sign In</button>
+                <button onclick="googleSignIn()"><i class="fab fa-google"></i> Sign In with Google</button>
+            </div>
+            <button class="sign-up-button" onclick="signUp()">Sign Up</button>
+            <p class="sign-up-label"><a href="/signup">Don't have a ClinGenie account? Sign up for one!</a></p>
+        </div>
+    </div>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <script>
+
+        function initGoogleSignIn() {
+            gapi.load('auth2', function() {
+            gapi.auth2.init({
+                client_id: 'YOUR_GOOGLE_CLIENT_ID' // Replace with your actual Google Client ID
+                });
+            });
+        }
+
+        // Call initGoogleSignIn when the window loads
+        window.onload = initGoogleSignIn;
+
+        async function googleSignIn() {
+            try {
+                const auth2 = await gapi.auth2.getAuthInstance();
+                const googleUser = await auth2.signIn();
+
+                // Get the user's profile information
+                const profile = googleUser.getBasicProfile();
+                const email = profile.getEmail();
+                const name = profile.getName();
+
+                // You can now use the user's email and name for further processing or send them to the server for authentication
+                console.log("Google Sign-In successful!");
+                console.log("Email: ", email);
+                console.log("Name: ", name);
+            } catch (error) {
+        console.error("Error signing in with Google:", error);
+            }
+        }
+
+        function signUp() {
+            fetch('/signup', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/signup';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+
+        function signIn() {
+            fetch('/profile', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/profile';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+    </script>
+</body>
+</html>
