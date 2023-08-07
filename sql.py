@@ -27,7 +27,7 @@ def sql(app):
             no_of_rows=get_row_count(rows)
 
             """ If there's only one row of output, then convert into into a sentence"""
-            if (no_of_rows == 1):
+            if (no_of_rows == 1 or no_of_cols == 1):
                text = get_text(cols_and_data="Question: " + query + ", Columns:" + ",".join(str(x) for x in col_names) + ", Data:" + ",".join(str(x) for x in rows))
                return {
                   "status": 'success',

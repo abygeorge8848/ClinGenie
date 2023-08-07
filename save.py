@@ -1,6 +1,7 @@
 from flask import request, jsonify
 import sqlite3
 from sqlite3 import Error
+from fuzzywuzzy import fuzz, process
 
 
 def save(app):
@@ -53,6 +54,7 @@ def data(app):
 
 
 def delete(app):
+
     @app.route('/data/delete', methods=['POST'])
     def delete_row():
         try:
@@ -71,6 +73,41 @@ def delete(app):
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
+
+
+
+def cache(app):
+
+    @app.route('/cache', methods=['POST'])
+    def cache_search():
+        try:
+            query = request.json['query']
+            if not query:
+                return jsonify({'error': 'rowId parameter is missing.'}), 400
+
+            conn = create_connection()
+            if conn is not None:
+                cursor = conn.cursor()
+
+                cursor.execute("SELECT * FROM entries")
+                rows = cursor.fetchall()
+
+                max_ratio = 0
+                max_row = None
+
+                for row in rows:
+                    question = row['question']
+                    ratio = fuzz.ratio(query.lower, question.lower())
+                    if ratio > max_ratio:
+                        max_row = row
+
+                if max_ratio > 85:
+                    return jsonify({'match': True, 'row': max_row}), 200
+                else:
+                    return jsonify({'match': False, 'row': None}), 200
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
 
 def create_connection():

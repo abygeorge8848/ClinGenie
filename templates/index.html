@@ -278,6 +278,26 @@
                         var query = $("#query").val();
                         //Fetch the results by making an API call to /query endpoint
                         //Display the results in the div
+                        const cacheEndPoint = "http://127.0.0.1:5000/cache";
+                        var execute = true;
+                        fetch(cacheEndPoint, {
+                          method: "POST",
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            query,
+                          })
+                        }).then((response) => {
+                          try {
+                            return response.json();
+                          } catch(error) {
+                            console.log(`An error occured while connection to the cache endpoint: ${error}`);
+                          }
+                        }).then((data) => {
+                          console.log(`Here is the data you wanted: ${data}`);
+                        })
+
 
                         const gptEndPoint = "http://127.0.0.1:5000/gpt/completions";
                         fetch(gptEndPoint, {
