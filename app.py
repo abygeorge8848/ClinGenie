@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from gpt import gpt
 from sql import sql
-from save import save, data, delete
+from save import save, data, delete, update
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -24,3 +24,4 @@ sql(app)
 save(app)
 data(app)
 delete(app)
+update(app)

@@ -32,13 +32,18 @@ def gpt(app):
         selected_dataset = data_dictionary[index]
 
         prompt = """
-            Given the following SQL tables, your job is to write queries given a user’s request.
+            You are a SQL expert, and your role is to generate an SQLite3 statement to answer users questions,
+            based on the dataset below: 
 
             DATASET
 
-            In the SQL query, please make all where clauses case-insensitive, handle common mis-spellings, handle common synonyms.
+            Follow the following rules while generating the SQL statement:
+            1. Make all where clauses case-insensitive. 
+            2. Handle common mis-spellings. 
+            3. Handle common synonyms.
+            4. Round all aggregate functions like average, sum, etc to 2 decimal places. For example, ROUND(AVG(ColumnName), 2).
+            5. Return only the SQL statement. Even if the user asks for a plot, chart or graph, you should return a SQL statement only.
 
-            Strictly provide only the sql statement.
         """.replace('DATASET', selected_dataset)
     
         query = request.get_json()['query']
@@ -74,9 +79,6 @@ def set_token_from_azure_cred():
 
 def gpt_call(prompt, query):
     deployment_id = set_token_from_azure_cred()
-
-    prompt = prompt.replace('\n', ' ')
-    query = query.replace('\n', ' ')
 
     response = ChatCompletion.create(
         deployment_id=deployment_id,

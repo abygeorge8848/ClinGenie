@@ -13,14 +13,16 @@ def sql(app):
 
         try:
             index = int(request.get_json()['databaseValue'])
-            database_names = ['cgdb.sqlite', 'cvd.db', 'sleep.db']
+            database_names = ['disease.db', 'cvd.db', 'sleep.db']
             db_name = database_names[index] 
             query = request.get_json()['query']
             sql = request.get_json()['sql']
+            print(f"The SQL query thats about to be run is : {sql}")
             connection = sqlite3.connect(db_name)
             cursor = connection.cursor()
             cursor.execute(sql)
             rows = cursor.fetchall()
+            
 
             col_names=[i[0] for i in cursor.description]
             no_of_cols=get_column_count(rows)

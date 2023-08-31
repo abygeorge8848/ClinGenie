@@ -1,7 +1,6 @@
 from flask import request, jsonify
 import sqlite3
 from sqlite3 import Error
-from fuzzywuzzy import fuzz, process
 
 
 def save(app):
@@ -16,10 +15,12 @@ def save(app):
             data = request.json['data']
             rawdata = request.json['globalData_string']
             columnnames = request.json['globalCols_string']
+            datasetoption = request.json['databaseValue']
+            refreshTime = request.json['completeTime']
 
             if data is not None:
                 try:
-                    cur.execute("INSERT INTO entries (shortName, question, data, rawdata, columnnames) VALUES ( ?, ?, ?, ?, ?)", (shortName, question, data, rawdata, columnnames))
+                    cur.execute("INSERT INTO entries (shortName, question, data, rawdata, columnnames, datasetoption, refreshTime) VALUES ( ?, ?, ?, ?, ?, ?, ?)", (shortName, question, data, rawdata, columnnames, datasetoption, refreshTime))
                     conn.commit()
 
                     return jsonify({ 'message': 'Data saved successfully.'}), 200
@@ -40,7 +41,7 @@ def data(app):
         if conn is not None:
             cur = conn.cursor()
             try:
-                cur.execute("SELECT id, shortName, question, data, rawdata, columnnames FROM entries")
+                cur.execute("SELECT id, shortName, question, data, rawdata, columnnames, datasetoption, refreshTime FROM entries")
                 rows = cur.fetchall()
                 col_names = [description[0] for description in cur.description]
                 entries = [dict(zip(col_names, row)) for row in rows]
@@ -54,7 +55,6 @@ def data(app):
 
 
 def delete(app):
-
     @app.route('/data/delete', methods=['POST'])
     def delete_row():
         try:
@@ -76,38 +76,27 @@ def delete(app):
 
 
 
-def cache(app):
-
-    @app.route('/cache', methods=['POST'])
-    def cache_search():
+def update(app):
+    @app.route('/data/update', methods=['POST'])
+    def update_time():
         try:
-            query = request.json['query']
-            if not query:
+            row_id = request.json.get('rowId')
+            refreshTime = request.json.get('completeTime')
+            if not row_id:
                 return jsonify({'error': 'rowId parameter is missing.'}), 400
 
             conn = create_connection()
             if conn is not None:
                 cursor = conn.cursor()
-
-                cursor.execute("SELECT * FROM entries")
-                rows = cursor.fetchall()
-
-                max_ratio = 0
-                max_row = None
-
-                for row in rows:
-                    question = row['question']
-                    ratio = fuzz.ratio(query.lower, question.lower())
-                    if ratio > max_ratio:
-                        max_row = row
-
-                if max_ratio > 85:
-                    return jsonify({'match': True, 'row': max_row}), 200
-                else:
-                    return jsonify({'match': False, 'row': None}), 200
-
+                cursor.execute("UPDATE entries SET refreshTime = ? WHERE id = ?", (refreshTime, row_id))
+                conn.commit()
+                conn.close()
+                return jsonify({'message': f'Row with id {row_id} has been updated with the latest time successfully with the latest refresh time : {refreshTime}.'}), 200
+        
         except Exception as e:
             return jsonify({'error': str(e)}), 500
+
+
 
 
 def create_connection():

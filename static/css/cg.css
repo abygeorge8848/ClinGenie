@@ -93,8 +93,10 @@
       color: #c1c0c0;
   }
   .navbar {
-        position: fixed;
+        position: -webkit-sticky; /* For Safari */
+        position: sticky;
         top: 0;
+        z-index: 1001;
         left: 0;
         width: 100%;
         height: 50px;
@@ -208,4 +210,39 @@
 .refresh-icon:hover .tooltip-text {
   visibility: visible;
   opacity: .8;
+}
+
+
+.blue-background {
+  background-color: blue;
+}
+
+.red-background {
+  background-color: red;
+}
+
+.green-background {
+  background-color: green;
+}
+
+#myChart {
+  position: relative;
+  top: -3%;
+  transform: scale(0.9);  
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Assuming you want the container to cover the full viewport height */
+  position: relative; /* This allows inner elements to be positioned relative to it */
+}
+
+
+.sticky-bar {
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  top: 50px; /* This will stick it to the top of the viewport */
+  z-index: 1000; /* Ensure it's above most other elements */
 }
